@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aniku — Nonton Anime Gratis di Android</title>
+  <meta name="description" content="Streaming anime sub Indonesia, gratis selamanya. Download APK Aniku untuk Android." />
+  <link rel="icon" href="{{ url_for('static', filename='img/icon.png') }}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Space Grotesk', 'sans-serif'],
+            mono: ['Space Mono', 'monospace'],
+          },
+          colors: {
+            ink:    '#0b0c10',
+            panel:  '#111318',
+            edge:   '#1e2028',
+            muted:  '#3a3d4a',
+            dim:    '#6b6f80',
+            mid:    '#9ca3af',
+            bone:   '#e8e9ed',
+            white:  '#ffffff',
+            red:    '#ff3d5a',
+            redlow: '#ff3d5a1a',
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: #0b0c10; color: #e8e9ed; font-family: 'Space Grotesk', sans-serif; }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+    }
+
+    /* ── NAV ── */
+    nav { border-bottom: 1px solid #1e2028; backdrop-filter: blur(16px); background: rgba(11,12,16,0.85); }
+
+    /* ── HERO ── */
+    .hero-grid {
+      background-image:
+        linear-gradient(rgba(255,61,90,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,61,90,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,61,90,0.12) 0%, transparent 70%);
+    }
+
+    /* ── DOWNLOAD BUTTON ── */
+    .dl-btn {
+      background: #ff3d5a;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(255,61,90,0);
+    }
+    .dl-btn:hover {
+      background: #ff2248;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255,61,90,0.35);
+    }
+    .dl-btn:active { transform: translateY(0); }
+
+    /* ── FEATURE CARD ── */
+    .feat {
+      border: 1px solid #1e2028;
+      background: #111318;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .feat:hover { border-color: rgba(255,61,90,0.3); background: #14151a; }
+
+    /* ── SCREENSHOT ── */
+    .phone-frame {
+      border-radius: 36px;
+      box-shadow: 0 0 0 2px #1e2028, 0 32px 64px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+
+    /* ── STEP ── */
+    .step-line { width: 1px; background: linear-gradient(to bottom, #ff3d5a44, transparent); }
+
+    /* ── CHANGELOG ── */
+    .cl-card {
+      border: 1px solid #1e2028;
+      background: #111318;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .cl-card.latest { border-color: rgba(255,61,90,0.35); }
+
+    /* ── MODAL ── */
+    .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
+
+    /* ── FADE IN ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0b0c10; }
+    ::-webkit-scrollbar-thumb { background: #3a3d4a; border-radius: 2px; }
+
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body class="overflow-x-hidden relative">
+
+  <!-- NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-8 h-8 rounded-xl" alt="Aniku" />
+      <span class="font-mono font-bold text-sm tracking-widest text-bone uppercase">Aniku</span>
+    </div>
+    <div class="hidden sm:flex items-center gap-2 text-xs font-medium">
+      <a href="#fitur"       class="px-3 py-1.5 rounded-full border border-edge text-dim hover:text-bone hover:border-muted transition-all">Fitur</a>
+      <a href="#screenshots" class="px-3 py-1.5 rounded-full border border-edge text-dim hover:text-bone hover:border-muted transition-all">Screenshots</a>
+      <a href="#install"     class="px-3 py-1.5 rounded-full border border-edge text-dim hover:text-bone hover:border-muted transition-all">Install</a>
+      <a href="#download"    class="px-3 py-1.5 rounded-full bg-red text-white font-semibold hover:bg-[#ff2248] transition-all">Download</a>
+      <a href="#changelog"   class="px-3 py-1.5 rounded-full border border-edge text-dim hover:text-bone hover:border-muted transition-all">Changelog</a>
+    </div>
+    <!-- mobile hamburger -->
+    <button id="mob-menu-btn" class="sm:hidden p-2 rounded-lg border border-edge text-dim hover:text-bone hover:border-muted transition-all" onclick="toggleMobMenu()">
+      <i class="fa-solid fa-bars text-sm"></i>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div id="mob-menu" class="hidden fixed top-[61px] left-0 right-0 z-40 bg-panel border-b border-edge px-4 py-3 flex flex-col gap-2 sm:hidden">
+    <a href="#fitur"       onclick="toggleMobMenu()" class="flex items-center gap-3 px-4 py-3 rounded-xl border border-edge text-sm text-dim hover:text-bone hover:border-muted transition-all">
+      <i class="fa-solid fa-star text-xs w-4 text-center"></i> Fitur
+    </a>
+    <a href="#screenshots" onclick="toggleMobMenu()" class="flex items-center gap-3 px-4 py-3 rounded-xl border border-edge text-sm text-dim hover:text-bone hover:border-muted transition-all">
+      <i class="fa-solid fa-mobile-screen text-xs w-4 text-center"></i> Screenshots
+    </a>
+    <a href="#install"     onclick="toggleMobMenu()" class="flex items-center gap-3 px-4 py-3 rounded-xl border border-edge text-sm text-dim hover:text-bone hover:border-muted transition-all">
+      <i class="fa-solid fa-circle-info text-xs w-4 text-center"></i> Cara Install
+    </a>
+    <a href="#download"    onclick="toggleMobMenu()" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-red text-sm text-white font-semibold hover:bg-[#ff2248] transition-all">
+      <i class="fa-solid fa-download text-xs w-4 text-center"></i> Download
+    </a>
+    <a href="#changelog"   onclick="toggleMobMenu()" class="flex items-center gap-3 px-4 py-3 rounded-xl border border-edge text-sm text-dim hover:text-bone hover:border-muted transition-all">
+      <i class="fa-solid fa-clock-rotate-left text-xs w-4 text-center"></i> Changelog
+    </a>
+  </div>
+
+  <!-- OS DETECTION BANNER -->
+  <div id="os-banner" class="hidden fixed bottom-0 left-0 right-0 z-50 px-4 py-3 bg-[#1a1a10] border-t border-yellow-600/40 text-center sm:hidden">
+    <p class="text-yellow-400 text-xs font-medium">
+      <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+      <span id="os-msg"></span>
+    </p>
+  </div>
+
+  <!-- HERO -->
+  <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 overflow-hidden hero-grid">
+    <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+    <div class="relative z-10 flex flex-col items-center text-center max-w-lg">
+
+      <div class="fade-up mb-8">
+        <div class="w-24 h-24 rounded-[28%] overflow-hidden ring-2 ring-edge shadow-2xl mx-auto" style="box-shadow: 0 0 40px rgba(255,61,90,0.2)">
+          <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
+        </div>
+      </div>
+
+      <div class="fade-up delay-1 mb-2">
+        <span class="font-mono text-xs text-red tracking-[0.3em] uppercase">Android App</span>
+      </div>
+
+      <h1 class="fade-up delay-1 text-4xl sm:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-5">
+        Anime sub Indo,<br /><span class="text-red">gratis selamanya.</span>
+      </h1>
+
+      <p class="fade-up delay-2 text-mid text-base sm:text-lg leading-relaxed mb-10 max-w-sm">
+        Streaming ribuan anime tanpa iklan, tanpa langganan. Langsung dari HP kamu.
+      </p>
+
+      <!-- tombol download dipindah ke section CTA -->
+
+    </div>
+
+    <!-- scroll hint -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-30">
+      <div class="w-px h-8 bg-red"></div>
+      <i class="fa-solid fa-chevron-down text-red text-xs"></i>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="border-y border-edge bg-panel">
+    <div class="max-w-4xl mx-auto px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-px bg-edge">
+      <div class="px-6 py-5 text-center bg-panel">
+        <p class="text-white font-bold text-2xl">100%</p>
+        <p class="text-dim text-xs mt-1">Gratis</p>
+      </div>
+      <div class="px-6 py-5 text-center bg-panel">
+        <p class="text-white font-bold text-2xl">0</p>
+        <p class="text-dim text-xs mt-1">Iklan</p>
+      </div>
+      <div class="px-6 py-5 text-center bg-panel">
+        <p class="text-white font-bold text-2xl">Sub ID</p>
+        <p class="text-dim text-xs mt-1">Bahasa Indonesia</p>
+      </div>
+      <div class="px-6 py-5 text-center bg-panel">
+        <p class="text-white font-bold text-2xl" id="stat-downloads">—</p>
+        <p class="text-dim text-xs mt-1">Downloads</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="px-6 py-24 max-w-5xl mx-auto" id="fitur">
+    <div class="mb-14 text-center">
+      <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Fitur</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Semua yang kamu butuhkan.</h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-play text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Streaming Langsung</h3>
+        <p class="text-dim text-xs leading-relaxed">Tonton episode terbaru tanpa download manual.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-bookmark text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Bookmark</h3>
+        <p class="text-dim text-xs leading-relaxed">Simpan anime favorit, lanjutkan kapan saja.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-calendar-days text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Jadwal Tayang</h3>
+        <p class="text-dim text-xs leading-relaxed">Anime yang rilis hari ini, langsung terlihat.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-magnifying-glass text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Cari & Filter</h3>
+        <p class="text-dim text-xs leading-relaxed">Temukan anime berdasarkan genre atau judul.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Riwayat Tonton</h3>
+        <p class="text-dim text-xs leading-relaxed">Otomatis tercatat, langsung lanjut dari episode terakhir.</p>
+      </div>
+      <div class="feat rounded-2xl p-5">
+        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+          <i class="fa-solid fa-users text-sm"></i>
+        </div>
+        <h3 class="font-semibold text-bone text-sm mb-1">Feed Sosial</h3>
+        <p class="text-dim text-xs leading-relaxed">Post, like, komentar bersama sesama penonton.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="py-24 border-t border-edge overflow-hidden" id="screenshots">
+    <div class="max-w-5xl mx-auto px-6 mb-14 text-center">
+      <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Screenshots</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Tampilan nyata dari HP.</h2>
+      <p class="text-dim text-sm mt-2">Bukan mockup. Langsung dari Aniku.</p>
+    </div>
+
+    <div class="flex items-end justify-center gap-4 px-6 overflow-x-auto pb-4" style="scroll-snap-type:x mandatory;">
+      <div class="phone-frame shrink-0 w-36 sm:w-44 opacity-50 scale-95 hover:opacity-80 hover:scale-100 transition-all duration-300 cursor-pointer" style="scroll-snap-align:center">
+        <img src="{{ url_for('static', filename='img/ss4.png') }}" alt="Screenshot 4" class="w-full block" />
+      </div>
+      <div class="phone-frame shrink-0 w-44 sm:w-52 z-10" style="scroll-snap-align:center; box-shadow: 0 0 0 2px rgba(255,61,90,0.4), 0 32px 80px rgba(0,0,0,0.7);">
+        <img src="{{ url_for('static', filename='img/ss1.png') }}" alt="Screenshot 1" class="w-full block" />
+      </div>
+      <div class="phone-frame shrink-0 w-36 sm:w-44 opacity-50 scale-95 hover:opacity-80 hover:scale-100 transition-all duration-300 cursor-pointer" style="scroll-snap-align:center">
+        <img src="{{ url_for('static', filename='img/ss2.png') }}" alt="Screenshot 2" class="w-full block" />
+      </div>
+      <div class="phone-frame shrink-0 w-36 sm:w-44 opacity-50 scale-95 hover:opacity-80 hover:scale-100 transition-all duration-300 cursor-pointer" style="scroll-snap-align:center; display:none" id="ss3-wrap">
+        <img src="{{ url_for('static', filename='img/ss3.png') }}" alt="Screenshot 3" class="w-full block" />
+      </div>
+    </div>
+  </section>
+
+  <!-- CARA INSTALL -->
+  <section class="px-6 py-24 border-t border-edge max-w-2xl mx-auto" id="install">
+    <div class="mb-14 text-center">
+      <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Panduan</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Install dalam 3 langkah.</h2>
+    </div>
+    <div class="flex flex-col gap-0">
+
+      <div class="flex gap-5">
+        <div class="flex flex-col items-center">
+          <div class="w-9 h-9 rounded-full bg-redlow border border-red/30 flex items-center justify-center text-red font-mono font-bold text-sm shrink-0">1</div>
+          <div class="step-line flex-1 my-2"></div>
+        </div>
+        <div class="pb-10 pt-1">
+          <p class="font-semibold text-bone mb-1">Download APK</p>
+          <p class="text-dim text-sm leading-relaxed">Tap tombol download di halaman ini. File <code class="font-mono text-xs bg-edge px-1.5 py-0.5 rounded text-red">Aniku.apk</code> tersimpan otomatis ke folder Downloads.</p>
+        </div>
+      </div>
+
+      <div class="flex gap-5">
+        <div class="flex flex-col items-center">
+          <div class="w-9 h-9 rounded-full bg-redlow border border-red/30 flex items-center justify-center text-red font-mono font-bold text-sm shrink-0">2</div>
+          <div class="step-line flex-1 my-2"></div>
+        </div>
+        <div class="pb-10 pt-1">
+          <p class="font-semibold text-bone mb-1">Aktifkan izin install</p>
+          <p class="text-dim text-sm leading-relaxed">Buka <span class="text-mid">Pengaturan → Keamanan</span> lalu aktifkan <span class="text-mid">"Install dari sumber tidak dikenal"</span>. Ini hanya perlu dilakukan sekali.</p>
+        </div>
+      </div>
+
+      <div class="flex gap-5">
+        <div class="flex flex-col items-center">
+          <div class="w-9 h-9 rounded-full bg-redlow border border-red/30 flex items-center justify-center text-red font-mono font-bold text-sm shrink-0">3</div>
+        </div>
+        <div class="pt-1">
+          <p class="font-semibold text-bone mb-1">Buka & install APK</p>
+          <p class="text-dim text-sm leading-relaxed">Buka file manager, tap <code class="font-mono text-xs bg-edge px-1.5 py-0.5 rounded text-red">Aniku.apk</code>, lalu tap Install. Selesai — nikmati anime gratis!</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <!-- FAQ -->
+  <section class="px-6 py-24 border-t border-edge" id="faq">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">FAQ</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Pertanyaan umum.</h2>
+      </div>
+      <div class="flex flex-col gap-3" id="faq-list">
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Apakah Aniku aman diinstall?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Ya, Aniku aman. Aplikasi ini open source dan dapat diaudit siapa saja di GitHub. Peringatan dari Google Play Protect muncul karena APK tidak didistribusikan lewat Play Store — bukan karena berbahaya. Tap <strong class="text-bone">"Tetap instal"</strong> untuk melanjutkan.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Kenapa perlu aktifkan "sumber tidak dikenal"?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Android secara default hanya mengizinkan install aplikasi dari Google Play Store. Karena Aniku didistribusikan langsung sebagai APK, kamu perlu mengaktifkan izin ini sekali saja. Pengaturan ini bisa dinonaktifkan lagi setelah instalasi selesai.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Apakah Aniku gratis selamanya?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Ya, Aniku 100% gratis tanpa biaya tersembunyi, langganan, atau iklan. Aplikasi ini dibuat untuk komunitas anime Indonesia. Jika ingin mendukung pengembangan, kamu bisa donasi via <a href="https://saweria.co/Dayynime" target="_blank" class="text-red hover:underline">Saweria</a>, <a href="https://trakteer.id/Dayynimee" target="_blank" class="text-red hover:underline">Trakteer</a>, atau <a href="https://sociabuzz.com/dayynime/tribe" target="_blank" class="text-red hover:underline">Sociabuzz</a>.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Bagaimana cara update ke versi terbaru?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Aniku akan menampilkan notifikasi otomatis di dalam aplikasi saat ada versi baru. Kamu juga bisa cek halaman <a href="#changelog" class="text-red hover:underline">Changelog</a> di sini dan download versi terbaru secara manual.</p>
+          </div>
+        </div>
+
+        <div class="faq-item border border-edge rounded-2xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-edge/50 transition-colors">
+            <span class="font-semibold text-bone text-sm">Android versi berapa yang didukung?</span>
+            <i class="fa-solid fa-chevron-down text-dim text-xs shrink-0 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-body hidden px-5 pb-5">
+            <p class="text-dim text-sm leading-relaxed">Aniku mendukung Android 7.0 (API 24) ke atas. Sebagian besar HP Android yang dirilis dari 2017 ke atas sudah kompatibel.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-24 border-t border-edge" id="download">
+    <div class="max-w-lg mx-auto text-center">
+      <div class="w-16 h-16 rounded-[24%] overflow-hidden mx-auto mb-6 ring-2 ring-red/30" style="box-shadow: 0 0 32px rgba(255,61,90,0.25)">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">Mulai nonton<br />sekarang.</h2>
+      <p class="text-dim text-sm mb-8">Gratis. Tanpa kartu kredit. Tanpa iklan.</p>
+      <a id="dl-btn-2" href="#"
+         class="dl-btn inline-flex items-center gap-3 text-white font-bold text-base px-8 py-4 rounded-2xl"
+         download>
+        <i class="fa-solid fa-download"></i>
+        <span id="dl-label-2">Memuat…</span>
+      </a>
+      <p class="text-dim text-xs mt-4">Android 6.0+ · APK ~20 MB</p>
+
+      <!-- Play Protect Note -->
+      <div class="mt-6 max-w-sm w-full rounded-2xl border border-yellow-600/30 bg-yellow-500/5 px-5 py-4 text-left">
+        <div class="flex items-start gap-3">
+          <i class="fa-solid fa-shield-halved text-yellow-500 mt-0.5 shrink-0"></i>
+          <div>
+            <p class="text-yellow-400 font-semibold text-sm mb-1">Muncul peringatan Google Play Protect?</p>
+            <p class="text-dim text-xs leading-relaxed">Ini normal untuk APK di luar Play Store. Play Protect memperingatkan karena belum mengenal developer Aniku — bukan karena berbahaya.</p>
+            <p class="text-xs leading-relaxed mt-2">Tap <span class="text-bone font-semibold">"Tetap instal"</span> untuk melanjutkan instalasi.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 pt-6 border-t border-edge w-full max-w-sm text-center">
+        <p class="text-dim text-xs mb-4">Suka Aniku? Traktir developer segelas kopi ☕</p>
+        <div class="flex flex-col gap-2">
+          <a href="https://saweria.co/Dayynime" target="_blank" rel="noopener"
+             class="flex items-center gap-3 px-5 py-3 rounded-xl border border-edge text-sm text-mid hover:text-bone hover:border-muted transition-all group">
+            <img src="https://saweria.co/favicon.ico" class="w-5 h-5 rounded" onerror="this.style.display='none'" />
+            <span class="flex-1 text-left">Saweria</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-40 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a href="https://trakteer.id/Dayynimee" target="_blank" rel="noopener"
+             class="flex items-center gap-3 px-5 py-3 rounded-xl border border-edge text-sm text-mid hover:text-bone hover:border-muted transition-all group">
+            <img src="https://trakteer.id/favicon.ico" class="w-5 h-5 rounded" onerror="this.style.display='none'" />
+            <span class="flex-1 text-left">Trakteer</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-40 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a href="https://sociabuzz.com/dayynime/tribe" target="_blank" rel="noopener"
+             class="flex items-center gap-3 px-5 py-3 rounded-xl border border-edge text-sm text-mid hover:text-bone hover:border-muted transition-all group">
+            <img src="https://sociabuzz.com/favicon.ico" class="w-5 h-5 rounded" onerror="this.style.display='none'" />
+            <span class="flex-1 text-left">Sociabuzz</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-40 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POLL -->
+  <section class="px-6 py-24 border-t border-edge" id="poll">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Poll</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Pendapat kamu.</h2>
+        <p class="text-dim text-sm mt-2">Bantu kami dengan memilih salah satu.</p>
+      </div>
+      <div class="flex flex-col gap-6" id="poll-container">
+        <!-- dirender JS -->
+        <div class="animate-pulse flex flex-col gap-3">
+          <div class="h-5 bg-edge rounded w-48"></div>
+          <div class="h-12 bg-edge rounded-xl"></div>
+          <div class="h-12 bg-edge rounded-xl"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHANGELOG -->
+  <section class="px-6 py-24 border-t border-edge" id="changelog">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-12 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Changelog</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Riwayat versi.</h2>
+        <p class="text-dim text-sm mt-2">Semua pembaruan dari waktu ke waktu.</p>
+      </div>
+      <div id="changelog-list" class="flex flex-col gap-3">
+        <div class="cl-card p-5 animate-pulse">
+          <div class="h-4 bg-edge rounded w-32 mb-3"></div>
+          <div class="h-3 bg-edge rounded w-full mb-2"></div>
+          <div class="h-3 bg-edge rounded w-4/5"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-edge px-6 py-10">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-6 h-6 rounded-lg" />
+        <span class="font-mono text-dim text-xs tracking-widest uppercase">Aniku</span>
+      </div>
+      <p class="text-dim text-xs text-center">© 2026 Aniku · Seluruh hak cipta dilindungi</p>
+      <div class="flex items-center gap-5 text-xs text-dim">
+        <div class="relative group">
+          <button class="hover:text-bone transition-colors flex items-center gap-1">
+            <i class="fa-solid fa-mug-hot text-xs"></i> Donasi
+            <i class="fa-solid fa-chevron-down text-[10px] ml-0.5"></i>
+          </button>
+          <div class="absolute bottom-6 left-0 hidden group-hover:flex flex-col gap-1 bg-panel border border-edge rounded-xl p-2 w-36 shadow-xl z-50">
+            <a href="https://saweria.co/Dayynime" target="_blank" rel="noopener"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-dim hover:text-bone hover:bg-edge transition-all">
+              <img src="https://saweria.co/favicon.ico" class="w-3.5 h-3.5 rounded" onerror="this.style.display='none'" />
+              Saweria
+            </a>
+            <a href="https://trakteer.id/Dayynimee" target="_blank" rel="noopener"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-dim hover:text-bone hover:bg-edge transition-all">
+              <img src="https://trakteer.id/favicon.ico" class="w-3.5 h-3.5 rounded" onerror="this.style.display='none'" />
+              Trakteer
+            </a>
+            <a href="https://sociabuzz.com/dayynime/tribe" target="_blank" rel="noopener"
+               class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-dim hover:text-bone hover:bg-edge transition-all">
+              <img src="https://sociabuzz.com/favicon.ico" class="w-3.5 h-3.5 rounded" onerror="this.style.display='none'" />
+              Sociabuzz
+            </a>
+          </div>
+        </div>
+        <span class="opacity-20">·</span>
+        <a href="#" onclick="openModal('modal-privasi'); return false;" class="hover:text-bone transition-colors">Privasi</a>
+        <span class="opacity-20">·</span>
+        <a href="#" onclick="openModal('modal-syarat'); return false;" class="hover:text-bone transition-colors">Syarat</a>
+
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
+  <div id="modal-privasi" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-panel border border-edge rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-edge">
+        <h2 class="font-mono font-bold text-bone text-xs tracking-widest uppercase">Kebijakan Privasi</h2>
+        <button onclick="closeModal('modal-privasi')" class="text-dim hover:text-bone transition-colors text-xl leading-none">&times;</button>
+      </div>
+      <div class="overflow-y-auto px-6 py-5 text-dim text-sm leading-relaxed space-y-4">
+        <p>Terakhir diperbarui: Juni 2026</p>
+        <p>Aniku menghargai privasi Anda. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda saat menggunakan aplikasi dan layanan kami.</p>
+        <h3 class="text-bone font-semibold">Data yang Kami Kumpulkan</h3>
+        <p>Kami dapat mengumpulkan informasi seperti nama pengguna, alamat email, preferensi tontonan, dan data penggunaan aplikasi untuk meningkatkan layanan kami.</p>
+        <h3 class="text-bone font-semibold">Penggunaan Data</h3>
+        <p>Data yang dikumpulkan digunakan untuk personalisasi konten, perbaikan layanan, dan komunikasi terkait akun Anda. Kami tidak menjual data pribadi Anda kepada pihak ketiga.</p>
+        <h3 class="text-bone font-semibold">Keamanan Data</h3>
+        <p>Kami menerapkan langkah-langkah keamanan teknis dan organisasi yang wajar untuk melindungi data Anda dari akses tidak sah, kehilangan, atau penyalahgunaan.</p>
+        <h3 class="text-bone font-semibold">Hak Pengguna</h3>
+        <p>Anda berhak mengakses, memperbarui, atau menghapus data pribadi Anda kapan saja dengan menghubungi tim dukungan kami.</p>
+        <h3 class="text-bone font-semibold">Hubungi Kami</h3>
+        <p>Jika ada pertanyaan mengenai kebijakan privasi ini, silakan hubungi kami melalui saluran dukungan resmi Aniku.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-syarat" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-overlay">
+    <div class="bg-panel border border-edge rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-edge">
+        <h2 class="font-mono font-bold text-bone text-xs tracking-widest uppercase">Syarat Penggunaan</h2>
+        <button onclick="closeModal('modal-syarat')" class="text-dim hover:text-bone transition-colors text-xl leading-none">&times;</button>
+      </div>
+      <div class="overflow-y-auto px-6 py-5 text-dim text-sm leading-relaxed space-y-4">
+        <p>Terakhir diperbarui: Juni 2026</p>
+        <p>Dengan menggunakan layanan Aniku, Anda menyetujui syarat dan ketentuan berikut. Harap baca dengan seksama sebelum menggunakan aplikasi kami.</p>
+        <h3 class="text-bone font-semibold">Penerimaan Syarat</h3>
+        <p>Dengan mengakses atau menggunakan Aniku, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui untuk terikat oleh syarat penggunaan ini.</p>
+        <h3 class="text-bone font-semibold">Penggunaan yang Diizinkan</h3>
+        <p>Aniku hanya boleh digunakan untuk tujuan pribadi dan non-komersial. Anda tidak diperkenankan menyalin, mendistribusikan, atau mengeksploitasi konten layanan kami tanpa izin tertulis.</p>
+        <h3 class="text-bone font-semibold">Akun Pengguna</h3>
+        <p>Anda bertanggung jawab atas keamanan akun Anda. Segala aktivitas yang terjadi di bawah akun Anda adalah tanggung jawab Anda sepenuhnya.</p>
+        <h3 class="text-bone font-semibold">Konten Pihak Ketiga</h3>
+        <p>Aniku mungkin menampilkan konten dari pihak ketiga. Kami tidak bertanggung jawab atas akurasi atau ketersediaan konten tersebut.</p>
+        <h3 class="text-bone font-semibold">Perubahan Layanan</h3>
+        <p>Kami berhak mengubah, menangguhkan, atau menghentikan layanan kapan saja tanpa pemberitahuan sebelumnya.</p>
+        <h3 class="text-bone font-semibold">Hubungi Kami</h3>
+        <p>Pertanyaan mengenai syarat penggunaan ini dapat disampaikan melalui saluran dukungan resmi Aniku.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Modal
+    function openModal(id) {
+      const m = document.getElementById(id);
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+    document.querySelectorAll('[id^="modal-"]').forEach(modal => {
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal.id); });
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('[id^="modal-"]').forEach(m => closeModal(m.id));
+    });
+
+    // Mobile menu
+    function toggleMobMenu() {
+      const m = document.getElementById('mob-menu');
+      m.classList.toggle('hidden');
+      m.classList.toggle('flex');
+    }
+  </script>
+
+  <!-- Dynamic GitHub Release + Changelog -->
+  <script>
+    (async () => {
+      const REPO = 'RMBLOGG/aniku-app';
+      const btn2 = document.getElementById('dl-btn-2');
+      const navDl = document.getElementById('nav-dl');
+      const label  = document.getElementById('dl-label');
+      const label2 = document.getElementById('dl-label-2');
+      const navVer = document.getElementById('nav-version');
+      const list   = document.getElementById('changelog-list');
+
+      function formatDate(iso) {
+        return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      function renderMarkdown(body) {
+        if (!body || !body.trim()) return null;
+        const lines = body.split('\n');
+        let html = '';
+        let inList = false;
+        for (let raw of lines) {
+          let line = raw.trim();
+          if (!line) { if (inList) { html += '</ul>'; inList = false; } continue; }
+          if (/^#+\s/.test(line)) continue;
+          line = line
+            .replace(/\*\*(.+?)\*\*/g, '<strong class="text-bone font-semibold">$1</strong>')
+            .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+            .replace(/`(.+?)`/g,       '<code class="bg-ink px-1.5 py-0.5 rounded text-xs font-mono text-red">$1</code>')
+            .replace(/~~(.+?)~~/g,     '<s>$1</s>');
+          if (/^[-*] /.test(raw)) {
+            if (!inList) { html += '<ul class="mt-3 space-y-1.5">'; inList = true; }
+            html += `<li class="text-dim text-sm flex gap-2.5"><span class="text-red mt-0.5 shrink-0">·</span><span>${line.replace(/^[-*] /, '')}</span></li>`;
+          } else {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += `<p class="text-dim text-sm mt-2">${line}</p>`;
+          }
+        }
+        if (inList) html += '</ul>';
+        return html || null;
+      }
+
+      function setDownload(btn, lbl, url, version, isDownload) {
+        btn.href = url;
+        if (isDownload) btn.setAttribute('download', ''); else btn.removeAttribute('download');
+        lbl.textContent = `Download ${version}`;
+      }
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`);
+        if (!res.ok) throw new Error('fetch failed');
+        const releases = await res.json();
+        if (!releases.length) throw new Error('no releases');
+
+        // Total downloads semua release
+        const totalDl = releases.reduce((sum, r) =>
+          sum + r.assets.reduce((s, a) => s + (a.download_count || 0), 0), 0);
+        const statEl = document.getElementById('stat-downloads');
+        if (statEl) {
+          statEl.dataset.target = totalDl;
+          statEl.textContent = '—'; // akan diisi counter animation
+        }
+
+        // Tombol utama
+        const latest = releases[0];
+        const latestApk = latest.assets.find(a => a.name.endsWith('.apk'));
+        const latestUrl = latestApk ? latestApk.browser_download_url : latest.html_url;
+        const latestDl  = !!latestApk;
+
+        setDownload(btn2, label2, latestUrl, latest.tag_name, latestDl);
+
+
+        // File size
+        if (latestApk && latestApk.size) {
+          const mb = (latestApk.size / 1024 / 1024).toFixed(1);
+          document.querySelector('#dl-size') && (document.getElementById('dl-size').textContent = `${mb} MB`);
+        }
+
+        // Changelog
+        list.innerHTML = releases.map((r, i) => {
+          const apk    = r.assets.find(a => a.name.endsWith('.apk'));
+          const dlUrl  = apk ? apk.browser_download_url : r.html_url;
+          const notes  = renderMarkdown(r.body);
+          const isNew  = i === 0;
+          const size   = apk ? `${(apk.size/1024/1024).toFixed(1)} MB` : '';
+          const dlCount = r.assets.reduce((s, a) => s + (a.download_count || 0), 0);
+          const cardId = 'cl-' + r.tag_name.replace(/\./g, '-');
+        return `
+<div class="cl-card ${isNew ? 'latest' : ''}">
+  <button onclick="toggleCl('${cardId}')" class="w-full px-5 py-4 flex items-center justify-between gap-4 flex-wrap text-left hover:bg-edge/30 transition-colors">
+    <div class="flex items-center gap-3 flex-wrap">
+      ${isNew ? '<span class="font-mono text-xs font-bold bg-red text-white px-2.5 py-0.5 rounded-full">Terbaru</span>' : ''}
+      <span class="font-mono font-bold text-bone text-sm">${r.tag_name}</span>
+      <span class="text-dim text-xs">${formatDate(r.published_at)}</span>
+      ${size ? `<span class="text-dim text-xs">${size}</span>` : ''}
+      <span class="flex items-center gap-1 text-dim text-xs"><i class="fa-solid fa-download text-[10px]"></i> ${dlCount.toLocaleString('id-ID')}</span>
+    </div>
+    <div class="flex items-center gap-3 shrink-0">
+      <a href="${dlUrl}" ${apk ? 'download' : 'target="_blank"'}
+         onclick="event.stopPropagation()"
+         class="flex items-center gap-2 text-xs font-semibold text-red border border-red/30 hover:border-red hover:bg-redlow px-3 py-1.5 rounded-full transition-all whitespace-nowrap">
+        <i class="fa-solid fa-download text-xs"></i> Download
+      </a>
+      ${notes ? `<i id="icon-${cardId}" class="fa-solid fa-chevron-down text-dim text-xs transition-transform duration-300 ${isNew ? 'rotate-180' : ''}"></i>` : ''}
+    </div>
+  </button>
+  ${notes ? `<div id="${cardId}" class="${isNew ? '' : 'hidden'} border-t border-edge px-5 py-4">${notes}</div>` : ''}
+</div>`;
+        }).join('');
+
+      } catch (e) {
+        const fallback = `https://github.com/${REPO}/releases/latest`;
+        btn2.href = fallback; btn2.removeAttribute('download');
+        label2.textContent = 'Download di GitHub';
+        list.innerHTML = '<p class="text-dim text-sm text-center py-8">Gagal memuat riwayat versi. <a href="' + fallback + '" class="text-red underline">Lihat di GitHub</a></p>';
+      }
+    })();
+  </script>
+
+  <!-- CHANGELOG ACCORDION -->
+  <script>
+    function toggleCl(id) {
+      const body = document.getElementById(id);
+      const icon = document.getElementById('icon-' + id);
+      if (!body) return;
+      const isOpen = !body.classList.contains('hidden');
+      body.classList.toggle('hidden', isOpen);
+      if (icon) icon.classList.toggle('rotate-180', !isOpen);
+    }
+  </script>
+
+  <!-- FAQ ACCORDION -->
+  <script>
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const body = item.querySelector('.faq-body');
+      const icon = btn.querySelector('i');
+      const isOpen = !body.classList.contains('hidden');
+
+      // Tutup semua dulu
+      document.querySelectorAll('.faq-item').forEach(el => {
+        el.querySelector('.faq-body').classList.add('hidden');
+        el.querySelector('i').classList.remove('rotate-180');
+        el.querySelector('button').classList.remove('border-b', 'border-edge');
+      });
+
+      // Toggle yang diklik
+      if (!isOpen) {
+        body.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+        btn.classList.add('border-b', 'border-edge');
+      }
+    }
+  </script>
+
+  <!-- OS DETECTION -->
+  <script>
+    (function() {
+      const ua = navigator.userAgent || '';
+      const isAndroid = /android/i.test(ua);
+      const isIOS = /iphone|ipad|ipod/i.test(ua);
+      const isDesktop = !isAndroid && !isIOS;
+      const banner = document.getElementById('os-banner');
+      const msg = document.getElementById('os-msg');
+
+      if (isIOS) {
+        msg.textContent = 'Aniku hanya tersedia untuk Android. iOS tidak didukung.';
+        banner.classList.remove('hidden');
+        // dim download buttons
+        document.querySelectorAll('.dl-btn').forEach(b => {
+          b.classList.add('opacity-50', 'pointer-events-none');
+        });
+      } else if (isDesktop) {
+        msg.textContent = 'Kamu membuka dari PC/Mac. Download APK dan transfer ke Android kamu.';
+        banner.classList.remove('hidden');
+      }
+    })();
+  </script>
+
+  <!-- COUNTER ANIMATION -->
+  <script>
+    function animateCounter(el, target, duration) {
+      const start = performance.now();
+      const update = (now) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // ease out cubic
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(ease * target);
+        el.textContent = current >= 1000
+          ? (current / 1000).toFixed(1).replace('.0', '') + 'K'
+          : current.toString();
+        if (progress < 1) requestAnimationFrame(update);
+      };
+      requestAnimationFrame(update);
+    }
+
+    // Trigger saat stats bar masuk viewport
+    const statsBar = document.querySelector('.grid.grid-cols-2');
+    if (statsBar) {
+      const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          const el = document.getElementById('stat-downloads');
+          const target = parseInt(el.dataset.target || el.textContent) || 0;
+          if (target > 0) animateCounter(el, target, 1200);
+          obs.disconnect();
+        }
+      }, { threshold: 0.5 });
+      obs.observe(statsBar);
+    }
+  </script>
+
+
+  <!-- SUPABASE POLL -->
+  <script>
+    const SUPA_URL = 'https://uczxaiyibnwgycodtcvm.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjenhhaXlpYm53Z3ljb2R0Y3ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MzYxNzAsImV4cCI6MjA5NjQxMjE3MH0.UUPfyZ4GJO6y8I5467p_piCxtyuyM5oYGX_-jPeiZRw';
+
+    const POLLS = [
+      {
+        id: 'safety',
+        question: 'Apakah Aniku aman digunakan?',
+        choices: [
+          { value: 'aman',  label: 'Aman', color: 'bg-green-500' },
+          { value: 'tidak', label: 'Tidak Aman', color: 'bg-red' },
+        ]
+      },
+      {
+        id: 'satisfaction',
+        question: 'Apakah kamu puas dengan Aniku?',
+        choices: [
+          { value: 'puas',   label: 'Puas', color: 'bg-green-500' },
+          { value: 'cukup',  label: 'Cukup', color: 'bg-yellow-500' },
+          { value: 'tidak',  label: 'Tidak Puas', color: 'bg-red' },
+        ]
+      },
+      {
+        id: 'recommend',
+        question: 'Akan merekomendasikan Aniku ke teman?',
+        choices: [
+          { value: 'ya',    label: 'Ya, pasti!', color: 'bg-green-500' },
+          { value: 'tidak', label: 'Tidak', color: 'bg-red' },
+        ]
+      },
+    ];
+
+    async function supaFetch(path, opts = {}) {
+      const res = await fetch(SUPA_URL + path, {
+        ...opts,
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json',
+          ...(opts.headers || {})
+        }
+      });
+      return res.ok ? res.json() : null;
+    }
+
+    async function fetchCounts(pollId) {
+      const data = await supaFetch(
+        `/rest/v1/polls?poll_id=eq.${pollId}&select=choice`
+      );
+      if (!data) return {};
+      const counts = {};
+      data.forEach(row => { counts[row.choice] = (counts[row.choice] || 0) + 1; });
+      return counts;
+    }
+
+    async function vote(pollId, choice, pollDef) {
+      try {
+        const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
+        if (voted[pollId]) return;
+
+        await fetch(SUPA_URL + '/rest/v1/polls', {
+          method: 'POST',
+          headers: {
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ poll_id: pollId, choice })
+        });
+
+        voted[pollId] = choice;
+        localStorage.setItem('aniku_polls', JSON.stringify(voted));
+
+        const counts = await fetchCounts(pollId);
+        renderPoll(pollDef, counts, voted[pollId]);
+        animatePolls();
+      } catch(e) {
+        console.error('Poll error:', e);
+      }
+    }
+
+    function renderPoll(poll, counts, votedChoice) {
+      const total = Object.values(counts).reduce((s, v) => s + v, 0);
+      const hasVoted = !!votedChoice;
+
+      const el = document.getElementById('poll-' + poll.id);
+      if (!el) return;
+
+      el.innerHTML = `
+        <p class="font-semibold text-bone text-sm mb-3">${poll.question}
+          ${hasVoted ? '<span class="ml-2 text-xs text-dim font-normal">· ' + total + ' suara</span>' : ''}
+        </p>
+        <div class="flex flex-col gap-2">
+          ${poll.choices.map(c => {
+            const count = counts[c.value] || 0;
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const isVoted = votedChoice === c.value;
+
+            // Selalu tampilkan progress bar, bisa diklik kalau belum vote
+            return `
+              <div class="relative rounded-xl border ${isVoted ? 'border-white/20' : 'border-edge'} overflow-hidden ${!hasVoted ? 'cursor-pointer hover:border-muted transition-all' : ''}"
+                ${!hasVoted ? `onclick="vote('${poll.id}','${c.value}', POLLS.find(p=>p.id==='${poll.id}'))"` : ''}>
+                <div class="${c.color} opacity-20 absolute inset-y-0 left-0" style="width:0%" data-pct="${pct}"></div>
+                <div class="relative flex items-center justify-between px-4 py-3 gap-3">
+                  <div class="flex items-center gap-2">
+                    ${isVoted
+                      ? '<i class="fa-solid fa-check text-xs text-white"></i>'
+                      : `<span class="w-3 h-3 rounded-full border-2 ${total > 0 ? 'border-' + c.color.replace('bg-','') : 'border-muted'} shrink-0"></span>`
+                    }
+                    <span class="text-sm ${isVoted ? 'text-bone font-semibold' : total > 0 ? 'text-mid' : 'text-dim'}">${c.label}</span>
+                  </div>
+                  <div class="flex items-center gap-3 shrink-0">
+                    <div class="w-20 h-1.5 bg-edge rounded-full overflow-hidden">
+                      <div class="${c.color} h-full rounded-full progress-bar" style="width:0%" data-pct="${pct}"></div>
+                    </div>
+                    <span class="text-xs text-dim w-10 text-right pct-label" data-pct="${pct}" data-count="${count}">0% <span class="text-[10px]">(0)</span></span>
+                  </div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    async function initPolls() {
+      const container = document.getElementById('poll-container');
+      const voted = JSON.parse(localStorage.getItem('aniku_polls') || '{}');
+
+      container.innerHTML = POLLS.map(p => `
+        <div id="poll-${p.id}" class="cl-card p-5">
+          <div class="animate-pulse flex flex-col gap-2">
+            <div class="h-4 bg-edge rounded w-3/4"></div>
+            <div class="h-10 bg-edge rounded-xl"></div>
+            <div class="h-10 bg-edge rounded-xl"></div>
+          </div>
+        </div>
+      `).join('');
+
+      await Promise.all(POLLS.map(async poll => {
+        const counts = await fetchCounts(poll.id);
+        renderPoll(poll, counts, voted[poll.id]);
+      }));
+      animatePolls();
+    }
+
+    function animatePolls() {
+      requestAnimationFrame(() => {
+        // Animasi progress bar
+        document.querySelectorAll('.progress-bar').forEach(bar => {
+          const target = parseFloat(bar.dataset.pct || 0);
+          setTimeout(() => { bar.style.transition = 'width 0.8s cubic-bezier(0.4,0,0.2,1)'; bar.style.width = target + '%'; }, 50);
+        });
+        // Animasi angka persentase
+        document.querySelectorAll('.pct-label').forEach(el => {
+          const targetPct = parseInt(el.dataset.pct || 0);
+          const targetCount = parseInt(el.dataset.count || 0);
+          const duration = 800;
+          const start = performance.now();
+          const tick = (now) => {
+            const p = Math.min((now - start) / duration, 1);
+            const ease = 1 - Math.pow(1 - p, 3);
+            const cur = Math.round(ease * targetPct);
+            const curC = Math.round(ease * targetCount);
+            el.innerHTML = cur + '% <span class="text-[10px]">(' + curC + ')</span>';
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
+      });
+    }
+
+    initPolls();
+  </script>
+
+</body>
+</html>
