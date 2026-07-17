@@ -132,6 +132,22 @@
     .bento:hover::before { border-color: transparent #ff3d8f transparent transparent; }
     .bento-icon { width: 38px; height: 38px; border-radius: 40%; }
 
+    .stat-card { background: #20111d; border: 1px solid #3c2338; transition: border-color .25s, transform .2s, background .25s; }
+    .stat-card::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+      background: linear-gradient(135deg, #ff3d8f66, transparent 40%, #ffc24740);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity .25s;
+    }
+    .stat-card:hover { border-color: #ff3d8f4d; background: #271729; transform: translateY(-3px); }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-icon {
+      width: 34px; height: 34px; border-radius: 40%;
+      background: #ff3d8f14; font-size: 13px;
+      box-shadow: inset 0 0 0 1px #ff3d8f26;
+    }
+
     /* ── STORIES RAIL (screenshots) ── */
     .shot-rail { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
     .shot-item { scroll-snap-align: center; }
@@ -223,9 +239,9 @@
       </p>
 
       <div class="fade-up delay-2 flex flex-col sm:flex-row items-center gap-3">
-        <a id="dl-btn-1" href="#" class="dl-btn inline-flex items-center gap-3 text-white font-bold text-sm px-7 py-3.5 rounded-2xl w-full sm:w-auto justify-center" download>
-          <i class="fa-solid fa-download"></i>
-          <span id="dl-label-1">Memuat…</span>
+        <a href="#download" class="dl-btn inline-flex items-center gap-3 text-white font-bold text-sm px-7 py-3.5 rounded-2xl w-full sm:w-auto justify-center">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+          Cara unduh
         </a>
         <a href="#screenshots" class="dl-btn-ghost inline-flex items-center gap-2 text-bone font-semibold text-sm px-6 py-3.5 rounded-2xl w-full sm:w-auto justify-center">
           Lihat cuplikan <i class="fa-solid fa-arrow-right text-xs"></i>
@@ -258,26 +274,37 @@
   </script>
 
   <!-- STATS BAR -->
-  <div class="border-y border-edge bg-panel">
-    <div class="max-w-3xl mx-auto px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-px bg-edge">
-      <div class="px-6 py-5 text-center bg-panel">
-        <p class="text-white font-bold text-2xl">100%</p>
-        <p class="text-dim text-xs mt-1">Gratis</p>
+  <section class="px-6 py-16 relative overflow-hidden">
+    <span aria-hidden="true" class="hidden sm:block absolute -bottom-6 -right-4 font-display text-[6rem] text-red/[0.04] select-none leading-none rotate-[-6deg]">統計</span>
+    <div class="max-w-3xl mx-auto relative">
+      <div class="mb-8 text-center">
+        <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">By the numbers</span>
+        <h2 class="font-display text-lg sm:text-xl text-white mt-3">Kenapa harus Aniku.</h2>
       </div>
-      <div class="px-6 py-5 text-center bg-panel">
-        <p class="text-white font-bold text-2xl">0</p>
-        <p class="text-dim text-xs mt-1">Iklan</p>
-      </div>
-      <div class="px-6 py-5 text-center bg-panel">
-        <p class="text-white font-bold text-2xl">Sub ID</p>
-        <p class="text-dim text-xs mt-1">Bahasa Indonesia</p>
-      </div>
-      <div class="px-6 py-5 text-center bg-panel">
-        <p class="text-white font-bold text-2xl" id="stat-downloads">—</p>
-        <p class="text-dim text-xs mt-1">Downloads</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="stat-card group relative rounded-2xl p-5 text-center overflow-hidden">
+          <div class="stat-icon mx-auto mb-3 flex items-center justify-center text-gold"><i class="fa-solid fa-crown"></i></div>
+          <p class="text-white font-display text-xl">100%</p>
+          <p class="text-dim text-[11px] mt-1.5 tracking-wide uppercase">Gratis</p>
+        </div>
+        <div class="stat-card group relative rounded-2xl p-5 text-center overflow-hidden">
+          <div class="stat-icon mx-auto mb-3 flex items-center justify-center text-red"><i class="fa-solid fa-ban"></i></div>
+          <p class="text-white font-display text-xl">0</p>
+          <p class="text-dim text-[11px] mt-1.5 tracking-wide uppercase">Iklan</p>
+        </div>
+        <div class="stat-card group relative rounded-2xl p-5 text-center overflow-hidden">
+          <div class="stat-icon mx-auto mb-3 flex items-center justify-center text-red"><i class="fa-solid fa-closed-captioning"></i></div>
+          <p class="text-white font-display text-xl">Sub ID</p>
+          <p class="text-dim text-[11px] mt-1.5 tracking-wide uppercase">Bahasa Indonesia</p>
+        </div>
+        <div class="stat-card group relative rounded-2xl p-5 text-center overflow-hidden">
+          <div class="stat-icon mx-auto mb-3 flex items-center justify-center text-red"><i class="fa-solid fa-fire"></i></div>
+          <p class="text-white font-display text-xl" id="stat-downloads">—</p>
+          <p class="text-dim text-[11px] mt-1.5 tracking-wide uppercase">Downloads</p>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- FEATURES — bento grid: size reflects which features are flagship -->
   <section class="px-6 py-20 max-w-3xl mx-auto" id="fitur">
@@ -729,6 +756,7 @@
       }
 
       function setDownload(btn, lbl, url, version, isDownload) {
+        if (!btn || !lbl) return;
         btn.href = url;
         if (isDownload) btn.setAttribute('download', ''); else btn.removeAttribute('download');
         lbl.textContent = 'Download ' + version;
