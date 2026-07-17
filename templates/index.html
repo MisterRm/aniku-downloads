@@ -9,27 +9,29 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Space Grotesk', 'sans-serif'],
-            mono: ['Space Mono', 'monospace'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Dela Gothic One', 'cursive'],
+            mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
-            ink:    '#0b0c10',
-            panel:  '#111318',
-            edge:   '#1e2028',
-            muted:  '#3a3d4a',
-            dim:    '#6b6f80',
-            mid:    '#9ca3af',
-            bone:   '#e8e9ed',
+            ink:    '#170b14',
+            panel:  '#211323',
+            edge:   '#3c2338',
+            muted:  '#5e3654',
+            dim:    '#a583a0',
+            mid:    '#e3c2da',
+            bone:   '#fdf1f7',
             white:  '#ffffff',
-            red:    '#ff3d5a',
-            redlow: '#ff3d5a1a',
+            red:    '#ff3d8f',
+            redlow: '#ff3d8f1a',
+            gold:   '#ffc247',
           },
         }
       }
@@ -38,72 +40,128 @@
   <style>
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { background: #0b0c10; color: #e8e9ed; font-family: 'Space Grotesk', sans-serif; }
+    body { background: #170b14; color: #fdf1f7; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-display { font-family: 'Dela Gothic One', cursive; letter-spacing: 0.01em; }
 
-    /* ── NOISE OVERLAY ── */
+    /* ── SCREENTONE (halftone) OVERLAY ── manga screen-tone dot texture, the signature motif */
     body::before {
       content: '';
       position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.025;
+      background-image: radial-gradient(rgba(255,61,143,0.5) 1px, transparent 1.4px);
+      background-size: 14px 14px;
+      opacity: 0.07;
+      mix-blend-mode: screen;
     }
 
     /* ── NAV ── */
-    nav { border-bottom: 1px solid #1e2028; backdrop-filter: blur(16px); background: rgba(11,12,16,0.85); }
+    nav { border-bottom: 1px solid #3c2338; backdrop-filter: blur(16px); background: rgba(23,11,20,0.85); }
 
-    /* ── HERO ── */
+    /* ── ON AIR pulse dot ── */
+    .onair-dot { width: 6px; height: 6px; border-radius: 999px; background: #ff3d8f; box-shadow: 0 0 0 rgba(255,61,143,0.6); animation: onairPulse 1.6s ease-in-out infinite; }
+    @keyframes onairPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,61,143,0.55); }
+      70%  { box-shadow: 0 0 0 7px rgba(255,61,143,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,61,143,0); }
+    }
+
+    /* ── HERO ── halftone dot field instead of a generic SaaS grid */
     .hero-grid {
-      background-image:
-        linear-gradient(rgba(255,61,90,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,61,90,0.06) 1px, transparent 1px);
-      background-size: 40px 40px;
+      background-image: radial-gradient(rgba(255,61,143,0.35) 1.5px, transparent 1.6px);
+      background-size: 22px 22px;
+      -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 40%, black 30%, transparent 75%);
+      mask-image: radial-gradient(ellipse 75% 60% at 50% 40%, black 30%, transparent 75%);
     }
     .hero-glow {
-      background: radial-gradient(ellipse 70% 55% at 50% 50%, rgba(255,61,90,0.12) 0%, transparent 70%);
+      background: radial-gradient(ellipse 70% 55% at 50% 45%, rgba(255,61,143,0.16) 0%, transparent 70%);
+    }
+
+    /* ── SAKURA PETALS ── ambient drifting petals, the hero's signature motion */
+    .petal-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .petal {
+      position: absolute; top: -8%;
+      width: 9px; height: 9px;
+      background: linear-gradient(135deg, #ff8fc7, #ff3d8f);
+      border-radius: 70% 20% 70% 20%;
+      opacity: 0.55;
+      animation-name: petalFall, petalSway;
+      animation-timing-function: linear, ease-in-out;
+      animation-iteration-count: infinite, infinite;
+    }
+    @keyframes petalFall { from { transform: translateY(-10vh) rotate(0deg); } to { transform: translateY(110vh) rotate(340deg); } }
+    @keyframes petalSway { 0%,100% { margin-left: -18px; } 50% { margin-left: 18px; } }
+
+    /* ── SPEECH BUBBLE ── comic-style callout used for the tagline chip */
+    .speech-bubble {
+      position: relative;
+      background: #fdf1f7;
+      color: #170b14;
+      border-radius: 18px;
+    }
+    .speech-bubble::after {
+      content: '';
+      position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%);
+      width: 18px; height: 18px;
+      background: #fdf1f7;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
     }
 
     /* ── DOWNLOAD BUTTON ── */
     .dl-btn {
-      background: #ff3d5a;
+      background: #ff3d8f;
       transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 0 0 0 rgba(255,61,90,0);
+      box-shadow: 0 0 0 0 rgba(255,61,143,0);
     }
     .dl-btn:hover {
-      background: #ff2248;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(255,61,90,0.35);
+      background: #ff1f7c;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 32px rgba(255,61,143,0.4);
     }
-    .dl-btn:active { transform: translateY(0); }
+    .dl-btn:active { transform: translateY(0) scale(0.99); }
 
-    /* ── FEATURE CARD ── */
+    /* ── FEATURE CARD ── manga panel with a folded corner tag, tilts like a trading card on hover */
     .feat {
-      border: 1px solid #1e2028;
-      background: #111318;
-      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      border: 1.5px solid #3c2338;
+      background: #211323;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s;
     }
-    .feat:hover { border-color: rgba(255,61,90,0.3); background: #14151a; }
+    .feat::before {
+      content: '';
+      position: absolute; top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 16px 16px 0;
+      border-color: transparent #3c2338 transparent transparent;
+      transition: border-color 0.25s;
+    }
+    .feat:hover {
+      border-color: rgba(255,61,143,0.4);
+      background: #271729;
+      transform: rotate(-0.6deg) translateY(-3px);
+    }
+    .feat:hover::before { border-color: transparent #ff3d8f transparent transparent; }
 
     /* ── SCREENSHOT ── */
     .phone-frame {
       border-radius: 36px;
-      box-shadow: 0 0 0 2px #1e2028, 0 32px 64px rgba(0,0,0,0.6);
+      box-shadow: 0 0 0 2px #3c2338, 0 32px 64px rgba(0,0,0,0.6);
       overflow: hidden;
     }
 
     /* ── STEP ── */
-    .step-line { width: 1px; background: linear-gradient(to bottom, #ff3d5a44, transparent); }
+    .step-line { width: 1px; background: linear-gradient(to bottom, #ff3d8f55, transparent); }
 
     /* ── CHANGELOG ── */
     .cl-card {
-      border: 1px solid #1e2028;
-      background: #111318;
+      border: 1.5px solid #3c2338;
+      background: #211323;
       border-radius: 16px;
       overflow: hidden;
     }
-    .cl-card.latest { border-color: rgba(255,61,90,0.35); }
+    .cl-card.latest { border-color: rgba(255,61,143,0.4); }
 
     /* ── MODAL ── */
-    .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
+    .modal-overlay { background: rgba(10,4,9,0.82); backdrop-filter: blur(8px); }
 
     /* ── FADE IN ── */
     @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
@@ -114,10 +172,10 @@
 
     /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #0b0c10; }
-    ::-webkit-scrollbar-thumb { background: #3a3d4a; border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: #170b14; }
+    ::-webkit-scrollbar-thumb { background: #5e3654; border-radius: 2px; }
 
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .petal { display: none; } }
   </style>
 </head>
 <body class="overflow-x-hidden relative">
@@ -126,7 +184,7 @@
   <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-8 h-8 rounded-xl" alt="Aniku" />
-      <span class="font-mono font-bold text-sm tracking-widest text-bone uppercase">Aniku</span>
+      <span class="font-display text-xs tracking-wide text-bone uppercase">Aniku</span>
     </div>
     <div class="hidden sm:flex items-center gap-2 text-xs font-medium">
       <a href="#fitur"       class="px-3 py-1.5 rounded-full border border-edge text-dim hover:text-bone hover:border-muted transition-all">Fitur</a>
@@ -171,19 +229,29 @@
   <!-- HERO -->
   <section class="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-20 overflow-hidden hero-grid">
     <div class="absolute inset-0 hero-glow pointer-events-none"></div>
+    <div class="petal-field" id="petal-field" aria-hidden="true"></div>
+
+    <!-- faint katakana texture, subject-specific background flavor -->
+    <span aria-hidden="true" class="hidden sm:block absolute top-24 -left-4 font-display text-[8rem] text-red/[0.05] select-none leading-none">アニメ</span>
+
     <div class="relative z-10 flex flex-col items-center text-center max-w-lg">
 
-      <div class="fade-up mb-8">
-        <div class="w-24 h-24 rounded-[28%] overflow-hidden ring-2 ring-edge shadow-2xl mx-auto" style="box-shadow: 0 0 40px rgba(255,61,90,0.2)">
+      <div class="fade-up mb-5">
+        <div class="w-24 h-24 rounded-[28%] overflow-hidden ring-2 ring-edge shadow-2xl mx-auto" style="box-shadow: 0 0 40px rgba(255,61,143,0.25)">
           <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
         </div>
       </div>
 
-      <div class="fade-up delay-1 mb-2">
-        <span class="font-mono text-xs text-red tracking-[0.3em] uppercase">Android App</span>
+      <div class="fade-up delay-1 speech-bubble inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold mb-7">
+        Nonton gratis, sub Indo, tanpa iklan!
       </div>
 
-      <h1 class="fade-up delay-1 text-4xl sm:text-6xl font-bold text-white leading-[1.1] tracking-tight mb-5">
+      <div class="fade-up delay-1 mb-3 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red/30 bg-redlow">
+        <span class="onair-dot"></span>
+        <span class="font-mono text-[11px] text-red tracking-[0.25em] uppercase">On Air · Android</span>
+      </div>
+
+      <h1 class="fade-up delay-1 font-display text-3xl sm:text-5xl text-white leading-[1.25] mb-5">
         Anime sub Indo,<br /><span class="text-red">gratis selamanya.</span>
       </h1>
 
@@ -196,11 +264,35 @@
     </div>
 
     <!-- scroll hint -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-30">
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-40">
       <div class="w-px h-8 bg-red"></div>
       <i class="fa-solid fa-chevron-down text-red text-xs"></i>
     </div>
   </section>
+
+  <script>
+    // sakura petals — decorative only, respects prefers-reduced-motion via CSS
+    (function () {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const field = document.getElementById('petal-field');
+      if (!field) return;
+      const COUNT = 14;
+      for (let i = 0; i < COUNT; i++) {
+        const p = document.createElement('span');
+        p.className = 'petal';
+        const left = Math.random() * 100;
+        const fallDur = 9 + Math.random() * 8;
+        const swayDur = 3 + Math.random() * 2;
+        const delay = Math.random() * 10;
+        const scale = 0.6 + Math.random() * 0.9;
+        p.style.left = left + '%';
+        p.style.animationDuration = fallDur + 's, ' + swayDur + 's';
+        p.style.animationDelay = '-' + delay + 's, -' + (Math.random() * swayDur) + 's';
+        p.style.transform = 'scale(' + scale + ')';
+        field.appendChild(p);
+      }
+    })();
+  </script>
 
   <!-- STATS BAR -->
   <div class="border-y border-edge bg-panel">
@@ -228,46 +320,46 @@
   <section class="px-6 py-24 max-w-5xl mx-auto" id="fitur">
     <div class="mb-14 text-center">
       <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Fitur</span>
-      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Semua yang kamu butuhkan.</h2>
+      <h2 class="font-display text-xl sm:text-2xl text-white mt-3 leading-snug">Semua yang kamu butuhkan.</h2>
     </div>
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
       <div class="feat rounded-2xl p-5">
-        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+        <div class="w-9 h-9 rounded-[40%] bg-redlow flex items-center justify-center text-red mb-4">
           <i class="fa-solid fa-play text-sm"></i>
         </div>
         <h3 class="font-semibold text-bone text-sm mb-1">Streaming Langsung</h3>
         <p class="text-dim text-xs leading-relaxed">Tonton episode terbaru tanpa download manual.</p>
       </div>
       <div class="feat rounded-2xl p-5">
-        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+        <div class="w-9 h-9 rounded-[40%] bg-redlow flex items-center justify-center text-red mb-4">
           <i class="fa-solid fa-bookmark text-sm"></i>
         </div>
         <h3 class="font-semibold text-bone text-sm mb-1">Bookmark</h3>
         <p class="text-dim text-xs leading-relaxed">Simpan anime favorit, lanjutkan kapan saja.</p>
       </div>
       <div class="feat rounded-2xl p-5">
-        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+        <div class="w-9 h-9 rounded-[40%] bg-redlow flex items-center justify-center text-red mb-4">
           <i class="fa-solid fa-calendar-days text-sm"></i>
         </div>
         <h3 class="font-semibold text-bone text-sm mb-1">Jadwal Tayang</h3>
         <p class="text-dim text-xs leading-relaxed">Anime yang rilis hari ini, langsung terlihat.</p>
       </div>
       <div class="feat rounded-2xl p-5">
-        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+        <div class="w-9 h-9 rounded-[40%] bg-redlow flex items-center justify-center text-red mb-4">
           <i class="fa-solid fa-magnifying-glass text-sm"></i>
         </div>
         <h3 class="font-semibold text-bone text-sm mb-1">Cari & Filter</h3>
         <p class="text-dim text-xs leading-relaxed">Temukan anime berdasarkan genre atau judul.</p>
       </div>
       <div class="feat rounded-2xl p-5">
-        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+        <div class="w-9 h-9 rounded-[40%] bg-redlow flex items-center justify-center text-red mb-4">
           <i class="fa-solid fa-clock-rotate-left text-sm"></i>
         </div>
         <h3 class="font-semibold text-bone text-sm mb-1">Riwayat Tonton</h3>
         <p class="text-dim text-xs leading-relaxed">Otomatis tercatat, langsung lanjut dari episode terakhir.</p>
       </div>
       <div class="feat rounded-2xl p-5">
-        <div class="w-9 h-9 rounded-xl bg-redlow flex items-center justify-center text-red mb-4">
+        <div class="w-9 h-9 rounded-[40%] bg-redlow flex items-center justify-center text-red mb-4">
           <i class="fa-solid fa-users text-sm"></i>
         </div>
         <h3 class="font-semibold text-bone text-sm mb-1">Feed Sosial</h3>
@@ -280,7 +372,7 @@
   <section class="py-24 border-t border-edge overflow-hidden" id="screenshots">
     <div class="max-w-5xl mx-auto px-6 mb-14 text-center">
       <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Screenshots</span>
-      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Tampilan nyata dari HP.</h2>
+      <h2 class="font-display text-xl sm:text-2xl text-white mt-3 leading-snug">Tampilan nyata dari HP.</h2>
       <p class="text-dim text-sm mt-2">Bukan mockup. Langsung dari Aniku.</p>
     </div>
 
@@ -304,7 +396,7 @@
   <section class="px-6 py-24 border-t border-edge max-w-2xl mx-auto" id="install">
     <div class="mb-14 text-center">
       <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Panduan</span>
-      <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Install dalam 3 langkah.</h2>
+      <h2 class="font-display text-xl sm:text-2xl text-white mt-3 leading-snug">Install dalam 3 langkah.</h2>
     </div>
     <div class="flex flex-col gap-0">
 
@@ -349,7 +441,7 @@
     <div class="max-w-2xl mx-auto">
       <div class="mb-12 text-center">
         <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">FAQ</span>
-        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Pertanyaan umum.</h2>
+        <h2 class="font-display text-xl sm:text-2xl text-white mt-3 leading-snug">Pertanyaan umum.</h2>
       </div>
       <div class="flex flex-col gap-3" id="faq-list">
 
@@ -412,7 +504,7 @@
       <div class="w-16 h-16 rounded-[24%] overflow-hidden mx-auto mb-6 ring-2 ring-red/30" style="box-shadow: 0 0 32px rgba(255,61,90,0.25)">
         <img src="{{ url_for('static', filename='img/icon.png') }}" class="w-full h-full object-cover" alt="Aniku" />
       </div>
-      <h2 class="text-3xl sm:text-5xl font-bold text-white leading-tight mb-3">Mulai nonton<br />sekarang.</h2>
+      <h2 class="font-display text-2xl sm:text-3xl text-white leading-snug mb-4">Mulai nonton<br />sekarang.</h2>
       <p class="text-dim text-sm mb-8">Gratis. Tanpa kartu kredit. Tanpa iklan.</p>
       <a id="dl-btn-2" href="#"
          class="dl-btn inline-flex items-center gap-3 text-white font-bold text-base px-8 py-4 rounded-2xl"
@@ -465,7 +557,7 @@
     <div class="max-w-2xl mx-auto">
       <div class="mb-12 text-center">
         <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Poll</span>
-        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Pendapat kamu.</h2>
+        <h2 class="font-display text-xl sm:text-2xl text-white mt-3 leading-snug">Pendapat kamu.</h2>
         <p class="text-dim text-sm mt-2">Bantu kami dengan memilih salah satu.</p>
       </div>
       <div class="flex flex-col gap-6" id="poll-container">
@@ -484,7 +576,7 @@
     <div class="max-w-2xl mx-auto">
       <div class="mb-12 text-center">
         <span class="font-mono text-xs text-red tracking-[0.25em] uppercase">Changelog</span>
-        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-2">Riwayat versi.</h2>
+        <h2 class="font-display text-xl sm:text-2xl text-white mt-3 leading-snug">Riwayat versi.</h2>
         <p class="text-dim text-sm mt-2">Semua pembaruan dari waktu ke waktu.</p>
       </div>
       <div id="changelog-list" class="flex flex-col gap-3">
