@@ -6,5 +6,9 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+@app.route("/payment-finish")
+def payment_finish():
+    return render_template("payment-finish.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
