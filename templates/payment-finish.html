@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Pembayaran Selesai — Aniku</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0e0e12;
+      color: #f5f5f5;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      text-align: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .card { max-width: 360px; }
+    h1 { font-size: 20px; margin-bottom: 8px; }
+    p { font-size: 14px; color: #b5b5bd; margin-bottom: 24px; }
+    a.btn {
+      display: inline-block;
+      background: #6c5ce7;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 3px solid #333;
+      border-top-color: #6c5ce7;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>Pembayaran diproses</h1>
+    <p>Mengalihkan kamu kembali ke aplikasi Aniku...</p>
+    <a class="btn" id="openApp" href="aniku://payment-finish">Buka Aniku</a>
+  </div>
+
+  <script>
+    (function () {
+      var deepLink = "aniku://payment-finish";
+      // Coba redirect otomatis
+      window.location.href = deepLink;
+
+      // Fallback: kalau setelah beberapa saat masih di halaman ini
+      // (browser block auto-redirect custom scheme), biarkan tombol manual terlihat.
+      setTimeout(function () {
+        document.querySelector(".card").style.opacity = "1";
+      }, 1500);
+    })();
+  </script>
+</body>
+</html>
